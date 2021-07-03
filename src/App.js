@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import './App.css';
+import SpotifyPlayer from './components/SpotifyPlayer';
 
 class App extends Component {
   constructor(props) {
@@ -28,12 +29,16 @@ class App extends Component {
   onStateChanged(state) {
     // if we're no longer listening to music, we'll get a null state.
     if (state !== null) {
-      const {current_track: {album: {images, name: album}, name: musicName, artists } } = state.track_window;
+      const {
+        current_track: {
+          album: { images, name: album },
+          name: musicName,
+          artists,
+        },
+      } = state.track_window;
       const trackName = musicName;
       const albumName = album;
-      const artistName = artists
-        .map((artist) => artist.name)
-        .join(', ');
+      const artistName = artists.map((artist) => artist.name).join(', ');
       const playing = !state.paused;
       this.setState({
         position: state.position,
@@ -42,7 +47,7 @@ class App extends Component {
         albumName,
         artistName,
         playing,
-        images: images[0]
+        images: images[0],
       });
     }
   }
@@ -115,19 +120,8 @@ class App extends Component {
   }
 
   render() {
-    const {
-      token,
-      loggedIn,
-      artistName,
-      trackName,
-      albumName,
-      error,
-      position,
-      duration,
-      playing,
-      images
-    } = this.state;
-    
+    const { token, loggedIn, error } = this.state;
+
     return (
       <div className="App">
         <h2>Now Playing</h2>
@@ -136,21 +130,12 @@ class App extends Component {
         {error && <p>Error: {error}</p>}
 
         {loggedIn ? (
-          <div>
-            <img src={images.url || null} alt="Album" />
-            <p>Artist: {artistName}</p>
-            <p>Track: {trackName}</p>
-            <p>Album: {albumName}</p>
-            <p>{position}</p>
-            <p>{duration}</p>
-            <p>
-              <button onClick={() => this.onPrevClick()}>Previous</button>
-              <button onClick={() => this.onPlayClick()}>
-                {playing ? 'Pause' : 'Play'}
-              </button>
-              <button onClick={() => this.onNextClick()}>Next</button>
-            </p>
-          </div>
+          <SpotifyPlayer
+            data={this.state}
+            onPlayClick={this.onPlayClick}
+            onNextClick={this.onNextClick}
+            onPrevClick={this.onPrevClick}
+          />
         ) : (
           <div>
             <p className="App-intro">
