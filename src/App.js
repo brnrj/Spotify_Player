@@ -15,6 +15,7 @@ class App extends Component {
       playing: false,
       position: 0,
       duration: 0,
+      images: [],
     };
     this.handleLogin = this.handleLogin.bind(this);
     this.checkForPlayer = this.checkForPlayer.bind(this);
@@ -27,24 +28,21 @@ class App extends Component {
   onStateChanged(state) {
     // if we're no longer listening to music, we'll get a null state.
     if (state !== null) {
-      const {
-        current_track: currentTrack,
-        position,
-        duration,
-      } = state.track_window;
-      const trackName = currentTrack.name;
-      const albumName = currentTrack.album.name;
-      const artistName = currentTrack.artists
+      const {current_track: {album: {images, name: album}, name: musicName, artists } } = state.track_window;
+      const trackName = musicName;
+      const albumName = album;
+      const artistName = artists
         .map((artist) => artist.name)
         .join(', ');
       const playing = !state.paused;
       this.setState({
-        position,
-        duration,
+        position: state.position,
+        duration: state.duration,
         trackName,
         albumName,
         artistName,
         playing,
+        images: images[0]
       });
     }
   }
@@ -127,22 +125,24 @@ class App extends Component {
       position,
       duration,
       playing,
+      images
     } = this.state;
-
+    
     return (
       <div className="App">
-        <div className="App-header">
-          <h2>Now Playing</h2>
-          <p>A Spotify Web Playback API Demo.</p>
-        </div>
+        <h2>Now Playing</h2>
+        <p>A Spotify Web Playback API Demo.</p>
 
         {error && <p>Error: {error}</p>}
 
         {loggedIn ? (
           <div>
+            <img src={images.url || null} alt="Album" />
             <p>Artist: {artistName}</p>
             <p>Track: {trackName}</p>
             <p>Album: {albumName}</p>
+            <p>{position}</p>
+            <p>{duration}</p>
             <p>
               <button onClick={() => this.onPrevClick()}>Previous</button>
               <button onClick={() => this.onPlayClick()}>
