@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import './App.css';
 import SpotifyPlayer from './components/SpotifyPlayer';
+import * as $ from 'jquery';
 
 class App extends Component {
   constructor(props) {
@@ -52,17 +53,31 @@ class App extends Component {
     }
   }
 
+  play(device_id, token) {
+    $.ajax({
+      url: 'https://api.spotify.com/v1/me/player/play?device_id=' + device_id,
+      type: 'PUT',
+      data: '{"uris": ["spotify:episode:3F3g7GrkBEDTZdtZDtXPG6"],  "position_ms": 0}',
+      beforeSend: function (xhr) {
+        xhr.setRequestHeader('Authorization', 'Bearer ' + token);
+      },
+      success: function (data) {
+        console.log(data);
+      },
+    });
+  }
+
   transferPlaybackHere() {
     const { deviceId, token } = this.state;
-    fetch("https://api.spotify.com/v1/me/player", {
-      method: "PUT",
+    fetch('https://api.spotify.com/v1/me/player', {
+      method: 'PUT',
       headers: {
         authorization: `Bearer ${token}`,
-        "Content-Type": "application/json",
+        'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        "device_ids": [ deviceId ],
-        "play": true,
+        device_ids: [deviceId],
+        play: false,
       }),
     });
   }
@@ -77,7 +92,9 @@ class App extends Component {
         getOAuthToken: (cb) => {
           cb(token);
         },
-        body: JSON.stringify({uris: ['spotify:track:48UPSzbZjgc449aqz8bxox']})
+        body: JSON.stringify({
+          uris: ['spotify:track:48UPSzbZjgc449aqz8bxox'],
+        }),
       });
       this.createEventHandlers();
 
@@ -87,6 +104,8 @@ class App extends Component {
   }
 
   createEventHandlers() {
+    const {token} = this.state
+    
     this.player.on('initialization_error', (e) => {
       console.error(e);
     });
@@ -109,11 +128,12 @@ class App extends Component {
       this.onStateChanged(state)
     );
     // Ready
-    this.player.on('ready', async(data) => {
+    this.player.on('ready', async (data) => {
       let { device_id } = data;
       console.log('Let the music play on!');
       await this.setState({ deviceId: device_id });
-      this.transferPlaybackHere();
+      // this.transferPlaybackHere();
+      this.play(device_id, token)
     });
   }
 
