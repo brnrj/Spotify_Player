@@ -17,7 +17,8 @@ const SpotifyPlayer = (props) => {
     onPrevClick,
     onPlayClick,
     onNextClick,
-    testando
+    handleRewind,
+    handleFoward
   } = props
   
   return (
@@ -37,7 +38,8 @@ const SpotifyPlayer = (props) => {
               {playing ? 'Pause' : 'Play'}
             </button>
             <button onClick={onNextClick}>Next</button>
-            <button onClick={testando}>testando</button>
+            <button onClick={handleRewind}>-15sec</button>
+            <button onClick={handleFoward}>+15sec</button>
           </p>
         </div>
       )}

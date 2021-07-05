@@ -26,12 +26,38 @@ class App extends Component {
     this.onPlayClick = this.onPlayClick.bind(this);
     this.onPrevClick = this.onPrevClick.bind(this);
     this.onNextClick = this.onNextClick.bind(this);
-    this.testando = this.testando.bind(this)
+    this.handleRewind = this.handleRewind.bind(this);
+    this.handleFoward = this.handleFoward.bind(this);
   }
-  testando(){
-    const {token} = this.state
-    new SpotifyWebApi().setAccessToken(token)
-    return new SpotifyWebApi().seek(40000)
+
+  async handleFoward() {
+    const { token } = this.state;
+    const { position, duration } = await this.player
+      .getCurrentState()
+      .then((state) => {
+        if (!state) {
+          console.log('User is not playing music through the Web Playback SDK');
+          return;
+        }
+        return state;
+      });
+    const foward = position + 15000;
+    new SpotifyWebApi().setAccessToken(token);
+    return new SpotifyWebApi().seek(foward > duration ? duration : foward);
+  }
+
+  async handleRewind() {
+    const { token } = this.state;
+    const { position } = await this.player.getCurrentState().then((state) => {
+      if (!state) {
+        console.log('User is not playing music through the Web Playback SDK');
+        return;
+      }
+      return state;
+    });
+    const rewind = position - 15000;
+    new SpotifyWebApi().setAccessToken(token);
+    return new SpotifyWebApi().seek(rewind < 0 ? 0 : rewind);
   }
 
   onStateChanged(state) {
@@ -107,8 +133,8 @@ class App extends Component {
   }
 
   createEventHandlers() {
-    const {token} = this.state
-    
+    const { token } = this.state;
+
     this.player.on('initialization_error', (e) => {
       console.error(e);
     });
@@ -124,8 +150,9 @@ class App extends Component {
     });
 
     // Playback status updates
-    this.player.on('player_state_changed', (state) =>
-      this.onStateChanged(state) || console.log(state)
+    this.player.on(
+      'player_state_changed',
+      (state) => this.onStateChanged(state) || console.log(state)
     );
     // Ready
     this.player.on('ready', async (data) => {
@@ -133,7 +160,7 @@ class App extends Component {
       console.log('Let the music play on!');
       await this.setState({ deviceId: device_id });
       // this.transferPlaybackHere();
-      this.play(device_id, token)
+      this.play(device_id, token);
     });
   }
 
@@ -172,7 +199,8 @@ class App extends Component {
             onPlayClick={this.onPlayClick}
             onNextClick={this.onNextClick}
             onPrevClick={this.onPrevClick}
-            testando={this.testando}
+            handleRewind={this.handleRewind}
+            handleFoward={this.handleFoward}
           />
         ) : (
           <div>
