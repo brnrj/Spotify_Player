@@ -16,7 +16,8 @@ const SpotifyPlayer = (props) => {
     },
     onPrevClick,
     onPlayClick,
-    onNextClick
+    onNextClick,
+    testando
   } = props
   
   return (
@@ -36,6 +37,7 @@ const SpotifyPlayer = (props) => {
               {playing ? 'Pause' : 'Play'}
             </button>
             <button onClick={onNextClick}>Next</button>
+            <button onClick={testando}>testando</button>
           </p>
         </div>
       )}

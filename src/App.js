@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import './App.css';
 import SpotifyPlayer from './components/SpotifyPlayer';
 import * as $ from 'jquery';
+import SpotifyWebApi from 'spotify-web-api-js';
 
 class App extends Component {
   constructor(props) {
@@ -25,6 +26,12 @@ class App extends Component {
     this.onPlayClick = this.onPlayClick.bind(this);
     this.onPrevClick = this.onPrevClick.bind(this);
     this.onNextClick = this.onNextClick.bind(this);
+    this.testando = this.testando.bind(this)
+  }
+  testando(){
+    const {token} = this.state
+    new SpotifyWebApi().setAccessToken(token)
+    return new SpotifyWebApi().seek(40000)
   }
 
   onStateChanged(state) {
@@ -57,7 +64,7 @@ class App extends Component {
     $.ajax({
       url: 'https://api.spotify.com/v1/me/player/play?device_id=' + device_id,
       type: 'PUT',
-      data: '{"uris": ["spotify:episode:3F3g7GrkBEDTZdtZDtXPG6"],  "position_ms": 0}',
+      data: '{"uris": ["spotify:episode:3F3g7GrkBEDTZdtZDtXPG6", "spotify:episode:64qWep5CyfC5RtoqD4udTw"],  "position_ms": 0}',
       beforeSend: function (xhr) {
         xhr.setRequestHeader('Authorization', 'Bearer ' + token);
       },
@@ -92,12 +99,8 @@ class App extends Component {
         getOAuthToken: (cb) => {
           cb(token);
         },
-        body: JSON.stringify({
-          uris: ['spotify:track:48UPSzbZjgc449aqz8bxox'],
-        }),
       });
       this.createEventHandlers();
-
       // finally, connect!
       this.player.connect();
     }
@@ -121,11 +124,8 @@ class App extends Component {
     });
 
     // Playback status updates
-    this.player.on('player_state_changed', (state) => {
-      console.log(state);
-    });
     this.player.on('player_state_changed', (state) =>
-      this.onStateChanged(state)
+      this.onStateChanged(state) || console.log(state)
     );
     // Ready
     this.player.on('ready', async (data) => {
@@ -172,6 +172,7 @@ class App extends Component {
             onPlayClick={this.onPlayClick}
             onNextClick={this.onNextClick}
             onPrevClick={this.onPrevClick}
+            testando={this.testando}
           />
         ) : (
           <div>
