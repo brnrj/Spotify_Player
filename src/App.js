@@ -8,7 +8,8 @@ class App extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      token:'BQDOEiOPkSIBv5An5daoLSZ7QYq8pw9grbb2cOkz7o3iVsZU2RKnJ4PWXNjAn-baKr6NXsMIQd-kmLCH-d0vWSuhT7iEHc2eoh94Y7gBnc4KZPYTIN55OJtlq6GbD7o0odEN2lWFQqovNrR5U0FhCMiYnvd8TK34WFVYIWHfj1eOgj1WlkObVvo',
+      token:
+        'BQDOEiOPkSIBv5An5daoLSZ7QYq8pw9grbb2cOkz7o3iVsZU2RKnJ4PWXNjAn-baKr6NXsMIQd-kmLCH-d0vWSuhT7iEHc2eoh94Y7gBnc4KZPYTIN55OJtlq6GbD7o0odEN2lWFQqovNrR5U0FhCMiYnvd8TK34WFVYIWHfj1eOgj1WlkObVvo',
       deviceId: '',
       loggedIn: false,
       error: '',
@@ -44,34 +45,6 @@ class App extends Component {
     });
   }
 
-  async handleFoward() {
-    const { token } = this.state;
-    const { position, duration } = await this.player.getCurrentState().then((state) => {
-        if (!state) {
-          console.log('User is not playing music through the Web Playback SDK');
-          return;
-        }
-        return state;
-      });
-    const foward = position + 15000;
-    new SpotifyWebApi().setAccessToken(token);
-    return new SpotifyWebApi().seek(foward > duration ? duration : foward);
-  }
-
-  async handleRewind() {
-    const { token } = this.state;
-    const { position } = await this.player.getCurrentState().then((state) => {
-      if (!state) {
-        console.log('User is not playing music through the Web Playback SDK');
-        return;
-      }
-      return state;
-    });
-    const rewind = position - 15000;
-    new SpotifyWebApi().setAccessToken(token);
-    return new SpotifyWebApi().seek(rewind < 0 ? 0 : rewind);
-  }
-
   onStateChanged(state) {
     // if we're no longer listening to music, we'll get a null state.
     if (state !== null) {
@@ -96,19 +69,6 @@ class App extends Component {
         images: images[0],
       });
     }
-  }
-
-  play(device_id, token, podcastsData) {
-    const { items } = podcastsData;
-    const data = items.map(({ uri }) => uri);
-    $.ajax({
-      url: 'https://api.spotify.com/v1/me/player/play?device_id=' + device_id,
-      type: 'PUT',
-      data: `{"uris": ${JSON.stringify(data)} ,  "position_ms": 0}`,
-      beforeSend: function (xhr) {
-        xhr.setRequestHeader('Authorization', 'Bearer ' + token);
-      },
-    });
   }
 
   // transferPlaybackHere() {
@@ -165,18 +125,57 @@ class App extends Component {
       (state) => this.onStateChanged(state) || console.log(state)
     );
     // Ready
-    this.player.on('ready', (data) => {
+    this.player.on('ready', async (data) => {
       let { device_id } = data;
       console.log('Let the music play on!');
-      this.setState({ deviceId: device_id, loggedIn: true });
-      this.play(device_id, token, podcastsData);
+      this.setState({ deviceId: device_id });
+      await this.play(device_id, token, podcastsData);
+      this.setState({loggedIn: true})
       // this.transferPlaybackHere();
     });
   }
 
-  handleLogin() {
-    this.playerCheckInterval = setInterval(() => this.checkForPlayer(), 1000);
-    this.getPodcastsPlaylist();
+  async handleFoward() {
+    const { token } = this.state;
+    const { position, duration } = await this.player
+      .getCurrentState()
+      .then((state) => {
+        if (!state) {
+          console.log('User is not playing music through the Web Playback SDK');
+          return;
+        }
+        return state;
+      });
+    const foward = position + 15000;
+    new SpotifyWebApi().setAccessToken(token);
+    return new SpotifyWebApi().seek(foward > duration ? duration : foward);
+  }
+
+  async handleRewind() {
+    const { token } = this.state;
+    const { position } = await this.player.getCurrentState().then((state) => {
+      if (!state) {
+        console.log('User is not playing music through the Web Playback SDK');
+        return;
+      }
+      return state;
+    });
+    const rewind = position - 15000;
+    new SpotifyWebApi().setAccessToken(token);
+    return new SpotifyWebApi().seek(rewind < 0 ? 0 : rewind);
+  }
+
+  async play(device_id, token, podcastsData) {
+    const { items } = podcastsData;
+    const data = items.map(({ uri }) => uri);
+    await $.ajax({
+      url: 'https://api.spotify.com/v1/me/player/play?device_id=' + device_id,
+      type: 'PUT',
+      data: `{"uris": ${JSON.stringify(data)} ,  "position_ms": 0}`,
+      beforeSend: function (xhr) {
+        xhr.setRequestHeader('Authorization', 'Bearer ' + token);
+      },
+    });
   }
 
   onPrevClick() {
@@ -190,7 +189,12 @@ class App extends Component {
   onNextClick() {
     this.player.nextTrack();
   }
-  
+
+  handleLogin() {
+    this.playerCheckInterval = setInterval(() => this.checkForPlayer(), 1000);
+    this.getPodcastsPlaylist();
+  }
+
   render() {
     const { position, duration, loggedIn, error } = this.state;
     const totalTime = position / duration > 0 ? position / duration : 0;
@@ -203,18 +207,18 @@ class App extends Component {
 
         {loggedIn ? (
           <>
-          <SpotifyPlayer
-            data={this.state}
-            onPlayClick={this.onPlayClick}
-            onNextClick={this.onNextClick}
-            onPrevClick={this.onPrevClick}
-            handleRewind={this.handleRewind}
-            handleFoward={this.handleFoward}
-          />
-          <div
-          style={{ transform: `scaleX(${totalTime })` }}
-          id="progress-bar"
-        />
+            <SpotifyPlayer
+              data={this.state}
+              onPlayClick={this.onPlayClick}
+              onNextClick={this.onNextClick}
+              onPrevClick={this.onPrevClick}
+              handleRewind={this.handleRewind}
+              handleFoward={this.handleFoward}
+            />
+            <div
+              style={{ transform: `scaleX(${totalTime})` }}
+              id="progress-bar"
+            />
           </>
         ) : (
           <div>
