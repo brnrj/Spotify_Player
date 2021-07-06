@@ -39,3 +39,10 @@
     transform: rotate(360deg);
   }
 }
+
+#progress-bar {
+  height: 20px;
+  background: red;
+  transform: scaleX(0);
+  transform-origin: center left;
+}

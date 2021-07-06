@@ -8,7 +8,7 @@ class App extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      token: '',
+      token:'BQC1N2l8v2DucBDLowfeeibu2NHHZGrk5pNdPw9H-4oMxrYm5tPNNKb0YApxEO6ppVzbkqzSZKYcQTjtrTnH6gs2T2ZZc1b7Y71quPUR7T7Lpym5-lnEHXfMQIMTD3zANiNMY_29UUdsp-BsPmzXRGD66NM5nvDwRJm5xF6Piy03BcdhHtsC2nw',
       deviceId: '',
       loggedIn: false,
       error: '',
@@ -19,6 +19,7 @@ class App extends Component {
       position: 0,
       duration: 0,
       images: [],
+      podcastsData: [],
     };
     this.handleLogin = this.handleLogin.bind(this);
     this.checkForPlayer = this.checkForPlayer.bind(this);
@@ -28,6 +29,19 @@ class App extends Component {
     this.onNextClick = this.onNextClick.bind(this);
     this.handleRewind = this.handleRewind.bind(this);
     this.handleFoward = this.handleFoward.bind(this);
+    this.handlePodcastsPlaylist = this.handlePodcastsPlaylist.bind(this);
+  }
+
+  async handlePodcastsPlaylist() {
+    const { token } = this.state;
+    const uri = '6KQIl4LUtifl3S3B37clPZ';
+    new SpotifyWebApi().setAccessToken(token);
+    new SpotifyWebApi().getShowEpisodes(uri, {}, (err, res) => {
+      if (err) {
+        console.log(err);
+      }
+      this.setState({ podcastsData: res });
+    });
   }
 
   async handleFoward() {
@@ -86,16 +100,15 @@ class App extends Component {
     }
   }
 
-  play(device_id, token) {
+  play(device_id, token, podcastsData) {
+    const { items } = podcastsData;
+    const data = items.map(({ uri }) => uri);
     $.ajax({
       url: 'https://api.spotify.com/v1/me/player/play?device_id=' + device_id,
       type: 'PUT',
-      data: '{"uris": ["spotify:episode:3F3g7GrkBEDTZdtZDtXPG6", "spotify:episode:64qWep5CyfC5RtoqD4udTw"],  "position_ms": 0}',
+      data: `{"uris": ${JSON.stringify(data)} ,  "position_ms": 0}`,
       beforeSend: function (xhr) {
         xhr.setRequestHeader('Authorization', 'Bearer ' + token);
-      },
-      success: function (data) {
-        console.log(data);
       },
     });
   }
@@ -115,7 +128,7 @@ class App extends Component {
     });
   }
 
-  checkForPlayer() {
+  async checkForPlayer() {
     const { token } = this.state;
 
     if (window.Spotify !== null) {
@@ -128,12 +141,12 @@ class App extends Component {
       });
       this.createEventHandlers();
       // finally, connect!
-      this.player.connect();
+      await this.player.connect();
     }
   }
 
   createEventHandlers() {
-    const { token } = this.state;
+    const { token, podcastsData } = this.state;
 
     this.player.on('initialization_error', (e) => {
       console.error(e);
@@ -155,12 +168,12 @@ class App extends Component {
       (state) => this.onStateChanged(state) || console.log(state)
     );
     // Ready
-    this.player.on('ready', async (data) => {
+    this.player.on('ready', (data) => {
       let { device_id } = data;
       console.log('Let the music play on!');
-      await this.setState({ deviceId: device_id });
+      this.setState({ deviceId: device_id });
+      this.play(device_id, token, podcastsData);
       // this.transferPlaybackHere();
-      this.play(device_id, token);
     });
   }
 
@@ -169,6 +182,7 @@ class App extends Component {
       this.setState({ loggedIn: true });
     }
     this.playerCheckInterval = setInterval(() => this.checkForPlayer(), 1000);
+    this.handlePodcastsPlaylist();
   }
 
   onPrevClick() {
@@ -182,10 +196,10 @@ class App extends Component {
   onNextClick() {
     this.player.nextTrack();
   }
-
+  
   render() {
-    const { token, loggedIn, error } = this.state;
-
+    const { position, duration, loggedIn, error } = this.state;
+    const totalTime = position / duration > 0 ? position / duration : 0;
     return (
       <div className="App">
         <h2>Now Playing</h2>
@@ -194,6 +208,7 @@ class App extends Component {
         {error && <p>Error: {error}</p>}
 
         {loggedIn ? (
+          <>
           <SpotifyPlayer
             data={this.state}
             onPlayClick={this.onPlayClick}
@@ -202,6 +217,11 @@ class App extends Component {
             handleRewind={this.handleRewind}
             handleFoward={this.handleFoward}
           />
+          <div
+          style={{ transform: `scaleX(${totalTime })` }}
+          id="progress-bar"
+        />
+          </>
         ) : (
           <div>
             <p className="App-intro">
@@ -211,15 +231,15 @@ class App extends Component {
               </a>
               .
             </p>
-            <p>
+            {/* <p>
               <input
                 type="text"
                 value={token}
                 onChange={(e) => this.setState({ token: e.target.value })}
               />
-            </p>
+            </p> */}
             <p>
-              <button onClick={() => this.handleLogin()}>Go</button>
+              <button onClick={() => this.handleLogin()}>Play Podcasts</button>
             </p>
           </div>
         )}
