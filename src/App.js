@@ -8,7 +8,7 @@ class App extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      token:'BQC1N2l8v2DucBDLowfeeibu2NHHZGrk5pNdPw9H-4oMxrYm5tPNNKb0YApxEO6ppVzbkqzSZKYcQTjtrTnH6gs2T2ZZc1b7Y71quPUR7T7Lpym5-lnEHXfMQIMTD3zANiNMY_29UUdsp-BsPmzXRGD66NM5nvDwRJm5xF6Piy03BcdhHtsC2nw',
+      token:'BQDOEiOPkSIBv5An5daoLSZ7QYq8pw9grbb2cOkz7o3iVsZU2RKnJ4PWXNjAn-baKr6NXsMIQd-kmLCH-d0vWSuhT7iEHc2eoh94Y7gBnc4KZPYTIN55OJtlq6GbD7o0odEN2lWFQqovNrR5U0FhCMiYnvd8TK34WFVYIWHfj1eOgj1WlkObVvo',
       deviceId: '',
       loggedIn: false,
       error: '',
@@ -29,10 +29,10 @@ class App extends Component {
     this.onNextClick = this.onNextClick.bind(this);
     this.handleRewind = this.handleRewind.bind(this);
     this.handleFoward = this.handleFoward.bind(this);
-    this.handlePodcastsPlaylist = this.handlePodcastsPlaylist.bind(this);
+    this.getPodcastsPlaylist = this.getPodcastsPlaylist.bind(this);
   }
 
-  async handlePodcastsPlaylist() {
+  getPodcastsPlaylist() {
     const { token } = this.state;
     const uri = '6KQIl4LUtifl3S3B37clPZ';
     new SpotifyWebApi().setAccessToken(token);
@@ -46,9 +46,7 @@ class App extends Component {
 
   async handleFoward() {
     const { token } = this.state;
-    const { position, duration } = await this.player
-      .getCurrentState()
-      .then((state) => {
+    const { position, duration } = await this.player.getCurrentState().then((state) => {
         if (!state) {
           console.log('User is not playing music through the Web Playback SDK');
           return;
@@ -113,24 +111,23 @@ class App extends Component {
     });
   }
 
-  transferPlaybackHere() {
-    const { deviceId, token } = this.state;
-    fetch('https://api.spotify.com/v1/me/player', {
-      method: 'PUT',
-      headers: {
-        authorization: `Bearer ${token}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        device_ids: [deviceId],
-        play: false,
-      }),
-    });
-  }
+  // transferPlaybackHere() {
+  //   const { deviceId, token } = this.state;
+  //   fetch('https://api.spotify.com/v1/me/player', {
+  //     method: 'PUT',
+  //     headers: {
+  //       authorization: `Bearer ${token}`,
+  //       'Content-Type': 'application/json',
+  //     },
+  //     body: JSON.stringify({
+  //       device_ids: [deviceId],
+  //       play: false,
+  //     }),
+  //   });
+  // }
 
   async checkForPlayer() {
     const { token } = this.state;
-
     if (window.Spotify !== null) {
       clearInterval(this.playerCheckInterval);
       this.player = new window.Spotify.Player({
@@ -147,7 +144,7 @@ class App extends Component {
 
   createEventHandlers() {
     const { token, podcastsData } = this.state;
-
+    //tratamento de erros
     this.player.on('initialization_error', (e) => {
       console.error(e);
     });
@@ -171,18 +168,15 @@ class App extends Component {
     this.player.on('ready', (data) => {
       let { device_id } = data;
       console.log('Let the music play on!');
-      this.setState({ deviceId: device_id });
+      this.setState({ deviceId: device_id, loggedIn: true });
       this.play(device_id, token, podcastsData);
       // this.transferPlaybackHere();
     });
   }
 
   handleLogin() {
-    if (this.state.token !== '') {
-      this.setState({ loggedIn: true });
-    }
     this.playerCheckInterval = setInterval(() => this.checkForPlayer(), 1000);
-    this.handlePodcastsPlaylist();
+    this.getPodcastsPlaylist();
   }
 
   onPrevClick() {
