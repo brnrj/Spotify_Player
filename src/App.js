@@ -8,8 +8,7 @@ class App extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      token:
-        '',
+      token: '',
       deviceId: '',
       loggedIn: false,
       error: '',
@@ -87,11 +86,10 @@ class App extends Component {
   //Inicia o player após receber as informações da playlist
   async play(device_id, token, podcastsData) {
     const { items } = podcastsData;
-    const data = items.map(({ uri }) => uri);
     await $.ajax({
       url: 'https://api.spotify.com/v1/me/player/play?device_id=' + device_id,
       type: 'PUT',
-      data: `{"uris": ${JSON.stringify(data)} ,  "position_ms": 0}`,
+      data: `{"uris": ${JSON.stringify(items.map(({ uri }) => uri))} ,  "position_ms": 0}`,
       beforeSend: function (xhr) {
         xhr.setRequestHeader('Authorization', 'Bearer ' + token);
       },
@@ -129,16 +127,19 @@ class App extends Component {
     //tratamento de erros
     this.player.on('initialization_error', (e) => {
       console.error(e);
+      this.setState({error: e.message})
     });
     this.player.on('authentication_error', (e) => {
       console.error(e);
-      this.setState({ loggedIn: false });
+      this.setState({error: e.message})
     });
     this.player.on('account_error', (e) => {
       console.error(e);
+      this.setState({error: e.message})
     });
     this.player.on('playback_error', (e) => {
       console.error(e);
+      this.setState({error: e.message})
     });
 
     // Playback status updates
