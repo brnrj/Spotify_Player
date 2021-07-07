@@ -25,7 +25,7 @@ const SpotifyPlayer = (props) => {
     <>
       {error && <p>Error: {error}</p>}
       {loggedIn && (
-        <div>
+        <div className="player">
           <img src={images.url || null} alt="Album" />
           <p>Artist: {artistName}</p>
           <p>Track: {trackName}</p>

@@ -9,7 +9,7 @@ class App extends Component {
     super(props);
     this.state = {
       token:
-        'BQCrVSTXZJFlDi1YRBvWN1OKkyyPp0a8aVeAUx7I-VoGUxpfhmZz93aFtnHFFE9st0X_MnmUhdOKWoAkZT4osZc4js-6zk8tcTvbV8BZ9S2bvaf77wnGkASO8dVSSaxBzMbnF1z9MbvJqZR4loyvXJR6MmhqYDxuf9xCWWWO7J10BaSdnxAaxrM',
+        '',
       deviceId: '',
       loggedIn: false,
       error: '',
@@ -215,7 +215,6 @@ class App extends Component {
         {error && <p>Error: {error}</p>}
 
         {loggedIn ? (
-          <>
             <SpotifyPlayer
               data={this.state}
               handleTogglePlay={this.handleTogglePlay}
@@ -224,10 +223,9 @@ class App extends Component {
               handleRewind={this.handleRewind}
               handleFoward={this.handleFoward}
             />
-          </>
         ) : (
-          <div>
-            <p className="App-intro">
+          <div className="App-intro">
+            <p>
               Enter your Spotify access token. Get it from{' '}
               <a href="https://beta.developer.spotify.com/documentation/web-playback-sdk/quick-start/#authenticating-with-spotify">
                 here
