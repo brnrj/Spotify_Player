@@ -20,6 +20,7 @@ class App extends Component {
       duration: 0,
       images: [],
       podcastsData: [],
+      seekBarValue: '',
     };
     this.handleLogin = this.handleLogin.bind(this);
     this.checkForPlayer = this.checkForPlayer.bind(this);
@@ -89,7 +90,9 @@ class App extends Component {
     await $.ajax({
       url: 'https://api.spotify.com/v1/me/player/play?device_id=' + device_id,
       type: 'PUT',
-      data: `{"uris": ${JSON.stringify(items.map(({ uri }) => uri))} ,  "position_ms": 0}`,
+      data: `{"uris": ${JSON.stringify(
+        items.map(({ uri }) => uri)
+      )} ,  "position_ms": 0}`,
       beforeSend: function (xhr) {
         xhr.setRequestHeader('Authorization', 'Bearer ' + token);
       },
@@ -127,19 +130,19 @@ class App extends Component {
     //tratamento de erros
     this.player.on('initialization_error', (e) => {
       console.error(e);
-      this.setState({error: e.message})
+      this.setState({ error: e.message });
     });
     this.player.on('authentication_error', (e) => {
       console.error(e);
-      this.setState({error: e.message})
+      this.setState({ error: e.message });
     });
     this.player.on('account_error', (e) => {
       console.error(e);
-      this.setState({error: e.message})
+      this.setState({ error: e.message });
     });
     this.player.on('playback_error', (e) => {
       console.error(e);
-      this.setState({error: e.message})
+      this.setState({ error: e.message });
     });
 
     // Playback status updates
@@ -207,8 +210,10 @@ class App extends Component {
   }
 
   render() {
-    const { loggedIn, error } = this.state;
+    const { loggedIn, error, duration, position } = this.state;
+    const progressTime = position / duration > 0 ? position / duration : 0;
     return (
+      <>
       <div className="App">
         <h2>Now Playing</h2>
         <p>A Spotify Web Playback API Demo.</p>
@@ -216,6 +221,7 @@ class App extends Component {
         {error && <p>Error: {error}</p>}
 
         {loggedIn ? (
+          <>
             <SpotifyPlayer
               data={this.state}
               handleTogglePlay={this.handleTogglePlay}
@@ -224,6 +230,8 @@ class App extends Component {
               handleRewind={this.handleRewind}
               handleFoward={this.handleFoward}
             />
+            
+          </>
         ) : (
           <div className="App-intro">
             <p>
@@ -246,6 +254,11 @@ class App extends Component {
           </div>
         )}
       </div>
+      <div
+              style={{ transform: `scaleX(${progressTime})` }}
+              id="progress-bar"
+            />
+      </>
     );
   }
 }

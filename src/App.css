@@ -14,3 +14,10 @@
   align-items: center;
   justify-content: center;
 }
+
+#progress-bar {
+  height: 20px;
+  background: red;
+  transform: scaleX(0);
+  transform-origin: center left;
+}
