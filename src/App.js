@@ -9,7 +9,7 @@ class App extends Component {
     super(props);
     this.state = {
       token:
-        '',
+        'BQB4DCRX0EZX2oBRMWjSK271pnr1oEhlx12GtSCp3D2QTtngFYvVBM-NVsVolP_5XrXlcfJ78FGfcGjNPlSk551658QwT0UT7CFV5txFwS9S9uGXYzoDo37TR6LaxQWjp-BHmc3yEDZjL8X308_wcNScJYE1Fph7ffUiPvJlY2UlTVv9RkwBx3k',
       deviceId: '',
       loggedIn: false,
       error: '',
@@ -34,17 +34,24 @@ class App extends Component {
   }
 
   //Carrega uma determinada playlist de Episodios
-  getPodcastsPlaylist() {
+  async getPodcastsPlaylist() {
     const { token } = this.state;
     const uri = '6KQIl4LUtifl3S3B37clPZ';
     new SpotifyWebApi().setAccessToken(token);
-    new SpotifyWebApi().getShowEpisodes(uri, {}, (err, res) => {
+    await new SpotifyWebApi().getShowEpisodes(uri, {}, (err, res) => {
       if (err) {
         console.log(err);
       }
       this.setState({ podcastsData: res });
     });
   }
+
+  // async startResume() {
+  //   const { token, podcastsData: {items}, deviceId } = this.state;
+  //   const data = items.map(({ uri }) => uri);
+  //   new SpotifyWebApi().setAccessToken(token);
+  //   new SpotifyWebApi().play({device_id: deviceId, position_ms: 0, uris: data}, (err, ok) => err ? console.log(err) : console.log(ok));
+  // }
 
   // transferPlaybackHere() {
   //   const { deviceId, token } = this.state;
@@ -75,6 +82,20 @@ class App extends Component {
       // finally, connect!
       await this.player.connect();
     }
+  }
+
+  //Inicia o player após receber as informações da playlist
+  async play(device_id, token, podcastsData) {
+    const { items } = podcastsData;
+    const data = items.map(({ uri }) => uri);
+    await $.ajax({
+      url: 'https://api.spotify.com/v1/me/player/play?device_id=' + device_id,
+      type: 'PUT',
+      data: `{"uris": ${JSON.stringify(data)} ,  "position_ms": 0}`,
+      beforeSend: function (xhr) {
+        xhr.setRequestHeader('Authorization', 'Bearer ' + token);
+      },
+    });
   }
 
   onStateChanged(state) {
@@ -136,20 +157,6 @@ class App extends Component {
     });
   }
 
-  //Inicia o player após receber as informações da playlist
-  async play(device_id, token, podcastsData) {
-    const { items } = podcastsData;
-    const data = items.map(({ uri }) => uri);
-    await $.ajax({
-      url: 'https://api.spotify.com/v1/me/player/play?device_id=' + device_id,
-      type: 'PUT',
-      data: `{"uris": ${JSON.stringify(data)} ,  "position_ms": 0}`,
-      beforeSend: function (xhr) {
-        xhr.setRequestHeader('Authorization', 'Bearer ' + token);
-      },
-    });
-  }
-
   //Botões do Player
   async handleFoward() {
     const { token } = this.state;
@@ -193,9 +200,9 @@ class App extends Component {
     this.player.nextTrack();
   }
 
-  handleLogin() {
+  async handleLogin() {
     this.playerCheckInterval = setInterval(() => this.checkForPlayer(), 1000);
-    this.getPodcastsPlaylist();
+    await this.getPodcastsPlaylist();
   }
 
   render() {
