@@ -1,26 +1,26 @@
 import React from 'react';
-
+import './styles.css';
 
 const SpotifyPlayer = (props) => {
   const {
     data: {
-    loggedIn,
-    artistName,
-    trackName,
-    albumName,
-    error,
-    position,
-    duration,
-    playing,
-    images,
+      loggedIn,
+      artistName,
+      trackName,
+      albumName,
+      error,
+      position,
+      duration,
+      playing,
+      images,
     },
-    onPrevClick,
-    onPlayClick,
-    onNextClick,
+    handlePreviousTrack,
+    handleTogglePlay,
+    handleNextTrack,
     handleRewind,
-    handleFoward
-  } = props
-  
+    handleFoward,
+  } = props;
+  const progressTime = position / duration > 0 ? position / duration : 0;
   return (
     <>
       {error && <p>Error: {error}</p>}
@@ -33,14 +33,18 @@ const SpotifyPlayer = (props) => {
           <p>{position}</p>
           <p>{duration}</p>
           <p>
-            <button onClick={onPrevClick}>Previous</button>
-            <button onClick={onPlayClick}>
+            <button onClick={handlePreviousTrack}>Previous</button>
+            <button onClick={handleTogglePlay}>
               {playing ? 'Pause' : 'Play'}
             </button>
-            <button onClick={onNextClick}>Next</button>
+            <button onClick={handleNextTrack}>Next</button>
             <button onClick={handleRewind}>-15sec</button>
             <button onClick={handleFoward}>+15sec</button>
           </p>
+          <div
+            style={{ transform: `scaleX(${progressTime})` }}
+            id="progress-bar"
+          />
         </div>
       )}
     </>
