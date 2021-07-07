@@ -9,7 +9,7 @@ class App extends Component {
     super(props);
     this.state = {
       token:
-        'BQB4DCRX0EZX2oBRMWjSK271pnr1oEhlx12GtSCp3D2QTtngFYvVBM-NVsVolP_5XrXlcfJ78FGfcGjNPlSk551658QwT0UT7CFV5txFwS9S9uGXYzoDo37TR6LaxQWjp-BHmc3yEDZjL8X308_wcNScJYE1Fph7ffUiPvJlY2UlTVv9RkwBx3k',
+        'BQCrVSTXZJFlDi1YRBvWN1OKkyyPp0a8aVeAUx7I-VoGUxpfhmZz93aFtnHFFE9st0X_MnmUhdOKWoAkZT4osZc4js-6zk8tcTvbV8BZ9S2bvaf77wnGkASO8dVSSaxBzMbnF1z9MbvJqZR4loyvXJR6MmhqYDxuf9xCWWWO7J10BaSdnxAaxrM',
       deviceId: '',
       loggedIn: false,
       error: '',
