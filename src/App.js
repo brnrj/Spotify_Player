@@ -8,7 +8,7 @@ class App extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      token: 'BQC0bWcNJKjgpjlfZQK-GwS6fy0mZxMrbc-EBw0Mw2CpTAmzxT4CQkPYEmbfytuBSLGawvg599m6_Bb_2NtKeiyiOcTCNyYT5EvWPhQLQGKUdcW0T3oNqcXwEeAhkMkgcaekxNv17biS6RpZiGkQ_BGvvAYA0QJd_h-A8sLiOY2MvSLencext88',
+      token: '',
       deviceId: '',
       loggedIn: false,
       error: '',
