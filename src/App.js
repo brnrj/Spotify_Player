@@ -8,7 +8,7 @@ class App extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      token: '',
+      token: 'BQC0bWcNJKjgpjlfZQK-GwS6fy0mZxMrbc-EBw0Mw2CpTAmzxT4CQkPYEmbfytuBSLGawvg599m6_Bb_2NtKeiyiOcTCNyYT5EvWPhQLQGKUdcW0T3oNqcXwEeAhkMkgcaekxNv17biS6RpZiGkQ_BGvvAYA0QJd_h-A8sLiOY2MvSLencext88',
       deviceId: '',
       loggedIn: false,
       error: '',
@@ -214,50 +214,51 @@ class App extends Component {
     const progressTime = position / duration > 0 ? position / duration : 0;
     return (
       <>
-      <div className="App">
-        <h2>Now Playing</h2>
-        <p>A Spotify Web Playback API Demo.</p>
+        <div className="App">
+          <h2>Now Playing</h2>
+          <p>A Spotify Web Playback API Demo.</p>
 
-        {error && <p>Error: {error}</p>}
+          {error && <p>Error: {error}</p>}
 
-        {loggedIn ? (
-          <>
-            <SpotifyPlayer
-              data={this.state}
-              handleTogglePlay={this.handleTogglePlay}
-              handleNextTrack={this.handleNextTrack}
-              handlePreviousTrack={this.handlePreviousTrack}
-              handleRewind={this.handleRewind}
-              handleFoward={this.handleFoward}
-            />
-            
-          </>
-        ) : (
-          <div className="App-intro">
-            <p>
-              Enter your Spotify access token. Get it from{' '}
-              <a href="https://beta.developer.spotify.com/documentation/web-playback-sdk/quick-start/#authenticating-with-spotify">
-                here
-              </a>
-              .
-            </p>
-            {/* <p>
+          {loggedIn ? (
+            <>
+              <SpotifyPlayer
+                data={this.state}
+                handleTogglePlay={this.handleTogglePlay}
+                handleNextTrack={this.handleNextTrack}
+                handlePreviousTrack={this.handlePreviousTrack}
+                handleRewind={this.handleRewind}
+                handleFoward={this.handleFoward}
+              />
+            </>
+          ) : (
+            <div className="App-intro">
+              <p>
+                Enter your Spotify access token. Get it from{' '}
+                <a href="https://beta.developer.spotify.com/documentation/web-playback-sdk/quick-start/#authenticating-with-spotify">
+                  here
+                </a>
+                .
+              </p>
+              {/* <p>
               <input
                 type="text"
                 value={token}
                 onChange={(e) => this.setState({ token: e.target.value })}
               />
             </p> */}
-            <p>
-              <button onClick={() => this.handleLogin()}>Play Podcasts</button>
-            </p>
-          </div>
-        )}
-      </div>
-      <div
-              style={{ transform: `scaleX(${progressTime})` }}
-              id="progress-bar"
-            />
+              <p>
+                <button onClick={() => this.handleLogin()}>
+                  Play Podcasts
+                </button>
+              </p>
+            </div>
+          )}
+        </div>
+        <div
+          style={{ transform: `scaleX(${progressTime})` }}
+          className="progress-bar"
+        />
       </>
     );
   }

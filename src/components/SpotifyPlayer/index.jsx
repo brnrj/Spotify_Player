@@ -1,9 +1,11 @@
 import React from 'react';
 import './styles.css';
+import ProgressBar from '../ProgressBar';
 
 const SpotifyPlayer = (props) => {
   const {
     data: {
+      token,
       loggedIn,
       artistName,
       trackName,
@@ -41,6 +43,7 @@ const SpotifyPlayer = (props) => {
               <button onClick={handleNextTrack}>Next</button>
               <button onClick={handleRewind}>-15sec</button>
               <button onClick={handleFoward}>+15sec</button>
+              <ProgressBar token={token} position={position} duration={duration} />
             </p>
           </div>
       </>
