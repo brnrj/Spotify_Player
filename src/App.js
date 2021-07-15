@@ -8,7 +8,8 @@ class App extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      token: 'BQC0bWcNJKjgpjlfZQK-GwS6fy0mZxMrbc-EBw0Mw2CpTAmzxT4CQkPYEmbfytuBSLGawvg599m6_Bb_2NtKeiyiOcTCNyYT5EvWPhQLQGKUdcW0T3oNqcXwEeAhkMkgcaekxNv17biS6RpZiGkQ_BGvvAYA0QJd_h-A8sLiOY2MvSLencext88',
+      token:
+        'BQCENjbBbeZ4fPDYgWpKQ6KgY0s8nTug0_8-mhwHRR9OQf40dABn_qbrt_5TIsPl4UHZxQ9zb078ZybQOGMR5p1Fysxf1ChR_TNa5nYUtlV0gmd80nICabE5GnaTPmB_FHjnJuSwXRDY2ZkVHoXnsc8aGIIwIq7PLTC76T7G_lUyyZ1aCxjrViA',
       deviceId: '',
       loggedIn: false,
       error: '',
@@ -20,7 +21,6 @@ class App extends Component {
       duration: 0,
       images: [],
       podcastsData: [],
-      seekBarValue: '',
     };
     this.handleLogin = this.handleLogin.bind(this);
     this.checkForPlayer = this.checkForPlayer.bind(this);
@@ -30,6 +30,7 @@ class App extends Component {
     this.handleNextTrack = this.handleNextTrack.bind(this);
     this.handleRewind = this.handleRewind.bind(this);
     this.handleFoward = this.handleFoward.bind(this);
+    this.handleSeekPosition = this.handleSeekPosition.bind(this);
     this.getPodcastsPlaylist = this.getPodcastsPlaylist.bind(this);
   }
 
@@ -204,6 +205,13 @@ class App extends Component {
     this.player.nextTrack();
   }
 
+  handleSeekPosition(position) {
+    console.log('funcionou', position)
+    this.player.seek(position).then(() => {
+      console.log(`Changed position to ${position}`);
+    });
+  }
+
   async handleLogin() {
     this.playerCheckInterval = setInterval(() => this.checkForPlayer(), 1000);
     await this.getPodcastsPlaylist();
@@ -229,6 +237,7 @@ class App extends Component {
                 handlePreviousTrack={this.handlePreviousTrack}
                 handleRewind={this.handleRewind}
                 handleFoward={this.handleFoward}
+                handleSeekPosition={this.handleSeekPosition}
               />
             </>
           ) : (

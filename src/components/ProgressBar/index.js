@@ -1,21 +1,17 @@
 import React, { useRef, useEffect, useState } from 'react';
-import './styles.css'
+import './styles.css';
 import SpotifyWebApi from 'spotify-web-api-js';
+import Timer from '../Timer';
 
 const ProgressBar = (props) => {
-  const {position, duration, token} = props
-  const [seekValue, setSeekValue] = useState()
+  const { position, duration, playing, handleSeekPosition } = props;
+  const [seekValue, setSeekValue] = useState();
+
   const progressBar = useRef();
 
-  async function seekPosition(){
-    new SpotifyWebApi().setAccessToken(token);
-    await new SpotifyWebApi().seek(seekValue)
-  }
-
   useEffect(() => {
-    progressBar.current.value = position
-    
-  }, [position])
+    progressBar.current.value = position;
+  }, [position]);
 
   return (
     <>
@@ -26,8 +22,10 @@ const ProgressBar = (props) => {
         max={duration}
         ref={progressBar}
         onChange={() => setSeekValue(progressBar.current.value)}
-        onMouseUp={seekPosition}
+        onMouseUp={() => handleSeekPosition(seekValue)}
+        on
       />
+      <Timer playerStatus={playing} position={position} duration={duration} />
     </>
   );
 };
